@@ -101,7 +101,10 @@ exports.loginWithPassword = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    res.json({ message: "Login successful" });
+    res.json({
+  message: "Login successful",
+  token
+});
 
   } catch (error) {
     res.status(500).json({ message: error.message });

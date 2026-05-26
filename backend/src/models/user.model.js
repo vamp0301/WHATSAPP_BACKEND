@@ -26,8 +26,7 @@ const userSchema = new mongoose.Schema({
       - Not required for Google OAuth users
     */
     password: {
-      type: String,
-      required:[true,"password is required by an user to sign up or open an account"],
+     type: String,
       minlength: 6,
       select:false,
       default:null// null for OAuth users
