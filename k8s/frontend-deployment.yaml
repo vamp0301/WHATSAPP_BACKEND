@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: whatsapp-frontend
+
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: whatsapp-frontend
+
+  template:
+    metadata:
+      labels:
+        app: whatsapp-frontend
+
+    spec:
+      containers:
+        - name: frontend
+
+          image: whatssapp_clone-frontend
+
+          imagePullPolicy: Never
+
+          ports:
+            - containerPort: 5173
+
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+
+            limits:
+              memory: "256Mi"
+              cpu: "250m"

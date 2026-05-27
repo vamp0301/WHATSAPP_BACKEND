@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+
+  backend:
+    build:
+      context: ./backend
+    container_name: whatsapp_backend
+    ports:
+      - "4020:3020"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    env_file:
+      - ./backend/.env
+    restart: always
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: whatsapp_frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: always
