@@ -1,43 +1,31 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import socket from "../socket";
 
 import Sidebar from "../components/Sidebar";
 import ChatHeader from "../components/ChatHeader";
 import ChatInput from "../components/ChatInput";
+import MessageBubble from "../components/MessageBubble";
 
 const Home = () => {
 
   const [messages, setMessages] = useState([]);
 
   /*
- =====================================
-        SOCKET CONNECTION
- =====================================
-*/
+   =====================================
+          RECEIVE MESSAGE
+   =====================================
+  */
   useEffect(() => {
-
-    console.log("Frontend Connected");
-
-    socket.on("connect", () => {
-
-      console.log(
-        "Socket Connected:",
-        socket.id
-      );
-
-    });
 
     socket.on("receiveMessage", (data) => {
 
-      console.log(
-        "MESSAGE RECEIVED:",
-        data
-      );
+      console.log("Received:", data);
 
       setMessages((prev) => [
         ...prev,
         {
           text: data.message,
+          own: true,
         },
       ]);
 
@@ -65,16 +53,15 @@ const Home = () => {
         <ChatHeader />
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-5">
+        <div className="flex-1 overflow-y-auto p-5 space-y-3">
 
           {messages.map((msg, index) => (
 
-            <div
+            <MessageBubble
               key={index}
-              className="bg-green-500 text-white p-3 rounded-lg mb-3 w-fit"
-            >
-              {msg.text}
-            </div>
+              own={msg.own}
+              text={msg.text}
+            />
 
           ))}
 
