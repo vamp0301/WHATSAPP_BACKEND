@@ -1,0 +1,84 @@
+name: WhatsApp Clone CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  build-and-deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # =====================================
+      # CLONE REPOSITORY
+      # =====================================
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # =====================================
+      # SETUP NODE
+      # =====================================
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+
+        with:
+          node-version: 20
+
+      # =====================================
+      # INSTALL BACKEND DEPENDENCIES
+      # =====================================
+      - name: Install Backend Dependencies
+
+        working-directory: ./backend
+
+        run: npm install
+
+      # =====================================
+      # INSTALL FRONTEND DEPENDENCIES
+      # =====================================
+      - name: Install Frontend Dependencies
+
+        working-directory: ./frontend
+
+        run: npm install
+
+      # =====================================
+      # BUILD FRONTEND
+      # =====================================
+      - name: Build Frontend
+
+        working-directory: ./frontend
+
+        run: npm run build
+
+      # =====================================
+      # BUILD BACKEND DOCKER IMAGE
+      # =====================================
+      - name: Build Backend Docker Image
+
+        run: |
+          docker build \
+          -t whatsapp-backend \
+          ./backend
+
+      # =====================================
+      # BUILD FRONTEND DOCKER IMAGE
+      # =====================================
+      - name: Build Frontend Docker Image
+
+        run: |
+          docker build \
+          -t whatsapp-frontend \
+          ./frontend
+
+      # =====================================
+      # SUCCESS MESSAGE
+      # =====================================
+      - name: CI/CD Success
+
+        run: echo "WhatsApp Clone Pipeline Completed Successfully 🚀"
+        
