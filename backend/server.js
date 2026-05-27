@@ -51,9 +51,10 @@ const server = http.createServer(app);
 const io = new Server(server, {
 
   cors: {
-    origin: process.env.CLIENT_URL,
-    credentials: true
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
   }
+
 });
 
 /*
@@ -62,6 +63,21 @@ const io = new Server(server, {
  =====================================
 */
 socketHandler(io);
+io.on("connection", (socket) => {
+socket.on("send_message", (messageData) => {
+
+  io.emit("receive_message", messageData);
+
+});
+  console.log(
+
+    "SOCKET CONNECTED:",
+
+    socket.id
+
+  );
+
+});
 
 /*
  =====================================

@@ -61,16 +61,20 @@ const socketHandler = (io) => {
 
         /*
  =====================================
-          SAVE MESSAGE
+          SAVE MESSAGE in mongoodb
  =====================================
 */
-        const newMessage = {
-          sender: userId,
-          receiver: receiverId,
-          message: message,
-          status: "delivered",
-          createdAt: new Date(),
-        };
+        const newMessage = await Message.create({
+
+  sender: "6834e2f11111111111111111",
+
+  receiver: "6834e2f22222222222222222",
+
+  message,
+
+  status: "sent",
+
+});
 
         console.log(
           "New Message:",

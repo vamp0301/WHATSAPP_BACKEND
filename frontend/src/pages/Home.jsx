@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+
+import axios from "../api/axios";
 import socket from "../socket";
 
 import Sidebar from "../components/Sidebar";
@@ -8,32 +10,64 @@ import MessageBubble from "../components/MessageBubble";
 
 const Home = () => {
 
-  const [messages, setMessages] = useState([]);
+  // SELECTED USER
+  const [selectedUser, setSelectedUser] =
+    useState(null);
 
-  /*
-   =====================================
-          RECEIVE MESSAGE
-   =====================================
-  */
+  // ALL CHAT MESSAGES
+  const [messages, setMessages] =
+    useState([]);
+
+  // =========================================
+  // FETCH OLD CONVERSATION
+  // =========================================
   useEffect(() => {
 
-    socket.on("receiveMessage", (data) => {
+    const fetchMessages = async () => {
 
-      console.log("Received:", data);
+      // IF NO USER SELECTED
+      if (!selectedUser) return;
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          text: data.message,
-          own: true,
-        },
-      ]);
+      try {
 
-    });
+        const res = await axios.get(
+          `/messages/conversation/${selectedUser.email}`
+        );
+
+        setMessages(res.data.messages);
+
+      } catch (error) {
+
+        console.log(
+          "Conversation Error:",
+          error.response?.data?.message || error.message
+        );
+      }
+    };
+
+    fetchMessages();
+
+  }, [selectedUser]);
+
+  // =========================================
+  // REAL-TIME SOCKET MESSAGE LISTENER
+  // =========================================
+  useEffect(() => {
+
+    socket.on(
+      "receive_message",
+      (newMessage) => {
+
+        setMessages((prev) => [
+          ...prev,
+          newMessage
+        ]);
+      }
+    );
 
     return () => {
 
-      socket.off("receiveMessage");
+      socket.off("receive_message");
 
     };
 
@@ -43,37 +77,64 @@ const Home = () => {
 
     <div className="h-screen bg-[#111B21] flex">
 
-      {/* Sidebar */}
-      <Sidebar />
+      {/* SIDEBAR */}
+      <Sidebar
+        setSelectedUser={setSelectedUser}
+      />
 
-      {/* Chat Area */}
+      {/* CHAT SECTION */}
       <div className="flex-1 flex flex-col bg-[#0B141A]">
 
-        {/* Header */}
-        <ChatHeader />
+        {/* HEADER */}
+        <ChatHeader
+          selectedUser={selectedUser}
+        />
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-5 space-y-3">
+        {/* MESSAGES */}
+        <div className="flex-1 overflow-y-auto p-5">
 
-          {messages.map((msg, index) => (
+          {
+            messages.length > 0 ? (
 
-            <MessageBubble
-              key={index}
-              own={msg.own}
-              text={msg.text}
-            />
+              messages.map((msg) => (
 
-          ))}
+                <MessageBubble
+                  key={msg._id}
+
+                  // MESSAGE TEXT
+                  text={msg.message}
+
+                  // OWN MESSAGE CHECK
+                  own={
+                    msg.sender?.email !==
+                    selectedUser?.email
+                  }
+                />
+
+              ))
+
+            ) : (
+
+              <div className="h-full flex items-center justify-center text-gray-500">
+
+                No messages yet
+
+              </div>
+            )
+          }
 
         </div>
 
-        {/* Input */}
-        <ChatInput />
+        {/* CHAT INPUT */}
+        <ChatInput
+          selectedUser={selectedUser}
+          messages={messages}
+          setMessages={setMessages}
+        />
 
       </div>
 
     </div>
-
   );
 };
 

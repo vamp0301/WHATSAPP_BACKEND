@@ -199,26 +199,34 @@ exports.verifyOTP = async (req, res) => {
 };
 // ===============================
 // GOOGLE OAUTH CALLBACK
-// ✅ NEW: Was missing entirely before
 // ===============================
 exports.googleCallback = async (req, res) => {
   try {
-    // req.user is set by passport after successful OAuth
+
     const user = req.user;
 
     if (!user) {
-      return res.redirect(`${process.env.CLIENT_URL}/login?error=oauth_failed`);
+      return res.redirect(
+        `${process.env.CLIENT_URL}/login?error=oauth_failed`
+      );
     }
 
-    // ✅ Issue JWT cookie for this Google-authenticated user
+    // SEND JWT COOKIE
     sendTokenCookie(res, user._id);
 
-    // Redirect to frontend
-    res.redirect(`${process.env.CLIENT_URL}/chat`);
+    // REDIRECT TO FRONTEND HOME
+    res.redirect(`${process.env.CLIENT_URL}/`);
 
   } catch (error) {
-    console.error("Google Callback Error:", error.message);
-    res.redirect(`${process.env.CLIENT_URL}/login?error=server_error`);
+
+    console.error(
+      "Google Callback Error:",
+      error.message
+    );
+
+    res.redirect(
+      `${process.env.CLIENT_URL}/login?error=server_error`
+    );
   }
 };
 

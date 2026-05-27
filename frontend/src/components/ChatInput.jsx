@@ -1,26 +1,63 @@
 import { useState } from "react";
+
+import axios from "../api/axios";
 import socket from "../socket";
 
-const ChatInput = () => {
+const ChatInput = ({
+  selectedUser,
+  setMessages
+}) => {
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] =
+    useState("");
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
 
-    if (message.trim() === "") return;
+    if (
+      !message.trim() ||
+      !selectedUser
+    ) return;
 
-    // SEND MESSAGE TO BACKEND
-    socket.emit("sendMessage", {
+    try {
 
-      receiverId: "TEMP_USER_ID",
+      // SEND TO BACKEND
+      const res = await axios.post(
+        "/messages/send",
+        {
+          receiverEmail:
+            selectedUser.email,
 
-      message: message,
+          message: message
+        }
+      );
 
-    });
+      // ADD MESSAGE TO UI
+      setMessages((prev) => [
+        ...prev,
+        res.data.data
+      ]);
 
-    // CLEAR INPUT
-    setMessage("");
+      socket.emit(
 
+  "send_message",
+
+  res.data.data
+
+);
+      // CLEAR INPUT
+      setMessage("");
+
+    } catch (error) {
+
+     console.log(
+  "Send Message Error:",
+  error.response?.data || error.message
+);
+
+alert(
+  error.response?.data?.message || error.message
+);
+    }
   };
 
   return (
@@ -37,7 +74,10 @@ const ChatInput = () => {
         type="text"
         placeholder="Type a message"
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={(e) =>
+          setMessage(e.target.value)
+        }
+
         onKeyDown={(e) => {
 
           if (e.key === "Enter") {
@@ -45,8 +85,8 @@ const ChatInput = () => {
             sendMessage();
 
           }
-
         }}
+
         className="flex-1 bg-[#2A3942] text-white px-4 py-3 rounded-full outline-none"
       />
 
@@ -59,7 +99,6 @@ const ChatInput = () => {
       </button>
 
     </div>
-
   );
 };
 

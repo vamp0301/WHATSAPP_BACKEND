@@ -1,43 +1,58 @@
-const Sidebar = () => {
+import { useEffect, useState } from "react";
 
-  const users = [
-    {
-      id: 1,
-      name: "Aman",
-      online: true
-    },
-    {
-      id: 2,
-      name: "Rohit",
-      online: false
-    },
-    {
-      id: 3,
-      name: "Priya",
-      online: true
-    }
-  ];
+import axios from "../api/axios";
 
+const Sidebar = ({
+  setSelectedUser
+}) => {
+
+  // REAL USERS STATE
+  const [users, setUsers] = useState([]);
+
+  // FETCH USERS
+  useEffect(() => {
+
+    const fetchUsers = async () => {
+
+      try {
+
+        const res = await axios.get(
+          "/users"
+        );
+
+        console.log(res.data);
+
+        // SAVE USERS
+        setUsers(res.data.users);
+
+      } catch (error) {
+
+        console.log(
+          "Fetch Users Error:",
+          error
+        );
+
+      }
+    };
+
+    fetchUsers();
+
+  }, []);
 
   return (
 
     <div className="w-[30%] bg-[#202C33] border-r border-gray-700 flex flex-col">
 
       {/* Header */}
-
       <div className="p-4 border-b border-gray-700">
 
         <h1 className="text-white text-3xl font-bold">
-
           WhatsApp
-
         </h1>
 
       </div>
 
-
       {/* Search */}
-
       <div className="p-3">
 
         <input
@@ -48,60 +63,67 @@ const Sidebar = () => {
 
       </div>
 
-
       {/* Users */}
-
       <div className="flex-1 overflow-y-auto">
 
-        {
-          users.map((user) => (
+        {users.map((user) => (
 
-            <div
-              key={user.id}
-              className="flex items-center gap-4 p-4 hover:bg-[#2A3942] cursor-pointer transition-all"
-            >
+          <div
 
-              {/* Avatar */}
+  key={user._id}
 
-              <div className="relative">
+  onClick={() =>
 
-                <img
-                  src="https://i.pravatar.cc/150"
-                  alt="avatar"
-                  className="w-12 h-12 rounded-full"
-                />
+    setSelectedUser(user)
 
-                {
-                  user.online && (
+  }
 
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#202C33]"></div>
-                  )
+  className="flex items-center gap-4 p-4 hover:bg-[#2A3942] cursor-pointer transition-all"
+
+>
+
+            {/* Avatar */}
+            <div className="relative">
+
+              <img
+                src={
+                  user.avatar ||
+                  "https://i.pravatar.cc/150"
                 }
+                alt="avatar"
+                className="w-12 h-12 rounded-full"
+              />
 
-              </div>
+              {
+                user.isOnline && (
 
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#202C33]"></div>
 
-              {/* User info */}
-
-              <div>
-
-                <h2 className="text-white font-semibold">
-
-                  {user.name}
-
-                </h2>
-
-                <p className="text-sm text-gray-400">
-
-                  Hey there 👋
-
-                </p>
-
-              </div>
+                )
+              }
 
             </div>
-          ))
-        }
+
+            {/* User Info */}
+            <div>
+
+              <h2 className="text-white font-semibold">
+
+                {user.name || "User"}
+
+              </h2>
+
+              <p className="text-sm text-gray-400">
+
+                {user.email}
+
+              </p>
+
+            </div>
+
+          </div>
+
+        ))}
 
       </div>
 

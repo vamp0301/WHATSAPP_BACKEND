@@ -4,18 +4,22 @@ import {
   MoreVertical
 } from "lucide-react";
 
-const ChatHeader = () => {
+const ChatHeader = ({
+  selectedUser
+}) => {
 
   return (
 
     <div className="bg-[#202C33] p-4 border-b border-gray-700 flex items-center justify-between">
 
-      {/* Left */}
-
+      {/* LEFT */}
       <div className="flex items-center gap-4">
 
         <img
-          src="https://i.pravatar.cc/150"
+          src={
+            selectedUser?.avatar ||
+            "https://i.pravatar.cc/150"
+          }
           alt="avatar"
           className="w-12 h-12 rounded-full"
         />
@@ -24,13 +28,20 @@ const ChatHeader = () => {
 
           <h2 className="text-white font-semibold text-lg">
 
-            Aman
+            {
+              selectedUser?.name ||
+              "Select User"
+            }
 
           </h2>
 
           <p className="text-green-400 text-sm">
 
-            Online
+            {
+              selectedUser?.isOnline
+                ? "Online"
+                : "Offline"
+            }
 
           </p>
 
@@ -38,9 +49,7 @@ const ChatHeader = () => {
 
       </div>
 
-
-      {/* Right Icons */}
-
+      {/* RIGHT ICONS */}
       <div className="flex items-center gap-5 text-gray-300">
 
         <Phone
